@@ -1,6 +1,8 @@
 # ctf-es
 CTF-ES — Plataforma CTF com 101 desafios (Web, Crypto, Forense, OSINT) — Python + HTML/JS
 
+<img width="1196" height="782" alt="{F037ADDE-B063-4411-84F4-3CB3F7E93AAF}" src="https://github.com/user-attachments/assets/f08b6860-3783-406f-ae45-6f9985ab05b3" />
+
 
 # CTF-ES — Plataforma Offline com 101 Desafios
 
