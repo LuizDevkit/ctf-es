@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CTF-ES — 101 Desafios Fácil / Médio / Avançado</title>
+<meta name="description" content="CTF-ES: plataforma CTF com 101 desafios completos: Web, Crypto, Forense, Reverso e OSINT. Níveis fácil, médio e avançado.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚑</text></svg>">
+<link rel="stylesheet" href="ctf.css?v=34">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;800&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<script src="lang.js?v=34"></script>
+</head>
+<body>
+<!-- FLAG secreta do desafio 1 escondida no HTML (Inspecione!) -->
+<!-- CTF-BR{1nsp3c10n4r_3l3m3nt0}  <-- parabéns, você achou sem abrir o modal! -->
+
+<header class="topbar">
+  <div class="wrap topbar-inner">
+    <div class="logo"><span class="logo-icon">⚑</span> CTF-<span class="accent">ES</span> <small>INÍCIO</small> <span id="onlineNow" style="font-size:11px;font-family:Inter"></span></div>
+    <a class="btn ghost sm home-m" href="arena.html">⚔ Jogar</a>
+<script>
+let _vid=null; try{ _vid=localStorage.getItem("ctf_vid"); if(!_vid){ _vid=Math.random().toString(36).slice(2)+Date.now().toString(36); localStorage.setItem("ctf_vid",_vid); } }catch(e){ _vid="v"+Math.random(); }
+async function _ping(){ try{ fetch("/api/ctf/ping",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({vid:_vid})}).catch(()=>{}); const r=await fetch("/api/ctf/online"); const d=await r.json(); if(d&&d.ok) document.getElementById("onlineNow").textContent=`🟢 ${d.total} online`; }catch(e){} }
+setInterval(_ping,60000); _ping();
+</script>
+    <nav class="nav">
+      <a href="arena.html"><span data-i18n="nav.arena">Arena</span></a>
+      <a href="ranking.html"><span data-i18n="nav.ranking">Ranking</span></a>
+      <a href="regras.html"><span data-i18n="nav.regras">Regras</span></a>
+      <a href="conta.html"><span data-i18n="nav.conta">Conta</span></a>
+    </nav>
+    <span class="langBox" style="display:flex;gap:4px"></span>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="wrap hero-center">
+    <div class="eyebrow" data-i18n="hero.eyebrow">CAPTURE THE FLAG • ONLINE • RANKING GLOBAL</div>
+    <h1><span data-i18n="hero.title">Hackeie 101 máquinas e vire lenda.</span></h1>
+    <p class="subtitle">23 Fáceis 🟢 • 41 Médios 🟡 • 37 Avançados 🔴 — Web, Crypto, Forense, Reverso, OSINT e Stego. Validação instantânea de flag no formato <code>CTF-BR{...}</code>.</p>
+
+    <div class="hud" id="landingHud">
+      <div class="hud-card"><strong>31.560</strong><span data-i18n="hud.pts">pontos em jogo</span></div>
+      <div class="hud-card"><strong>101</strong><span data-i18n="hud.desafios">desafios</span></div>
+      <div class="hud-card"><strong>5</strong><span data-i18n="hud.podios">pódios</span></div>
+    </div>
+<script>
+(function(){
+  function fmt(ms){ if(ms==null||!isFinite(ms)) return "—"; const s=Math.floor(ms/1000); const p=n=>String(n).padStart(2,"0"); return p(Math.floor(s/3600))+":"+p(Math.floor(s%3600/60))+":"+p(s%60); }
+  function pat(p){ if(p>=9282) return "🏴‍☠️ Lenda"; if(p>=6006) return "💀 Elite"; if(p>=3276) return "🔥 Hacker"; if(p>=1) return "💻 Script"; return "🌱 Recruta"; }
+  (async()=>{
+    const t=localStorage.getItem("ctf_token"); if(!t) return;
+    try{
+      const r=await fetch("/api/ctf/me?token="+encodeURIComponent(t)); const d=await r.json();
+      if(!d||!d.ok) return;
+      const n=Object.keys(d.solved||{}).length;
+      document.getElementById("landingHud").innerHTML=
+        `<div class="hud-card"><strong>${d.pts}</strong><span>👤 ${d.user} — seus pontos</span></div>`+
+        `<div class="hud-card"><strong>${n}/101</strong><span>resolvidos</span></div>`+
+        `<div class="hud-card"><strong>${pat(d.pts)}</strong><span>sua patente</span></div>`+
+        `<div class="hud-card"><strong>${fmt(d.time)}</strong><span>seu tempo</span></div>`;
+    }catch(e){}
+  })();
+})();
+</script>
+
+    <div class="hero-actions">
+      <a class="btn primary" href="arena.html" data-i18n="hero.arena">⚔ Entrar na arena →</a>
+      <a class="btn ghost" href="regras.html" data-i18n="hero.regras">📜 Ler regras</a>
+    </div>
+  </div>
+</section>
+
+<section class="wrap lab" id="lideres">
+  <h2 style="text-align:center" data-i18n="lideres.t">🏆 Líderes de cada categoria</h2>
+  <p class="muted" style="text-align:center">Os 1º colocados em destaque — <a href="ranking.html">ver ranking completo →</a></p>
+  <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(200px,1fr))" id="leadGrid">
+    <div class="card"><h3 data-i18n="lid.pts">🏆 Pontuação</h3><div id="leadPts"><span class="muted">…</span></div></div>
+
+    <div class="card"><h3 data-i18n="lid.team">👥 Equipes</h3><div id="leadTeam"><span class="muted">…</span></div></div>
+    <div class="card"><h3 data-i18n="lid.efic">⚡ Eficiência</h3><div id="leadEfic"><span class="muted">…</span></div></div>
+    <div class="card"><h3 data-i18n="lid.final">👑 Recorde da Final</h3><div id="leadFinal"><span class="muted">…</span></div></div>
+  </div>
+</section>
+<script>
+(async()=>{
+  function fmt(ms){ if(ms==null||!isFinite(ms)) return "—"; const s=Math.floor(ms/1000); const p=n=>String(n).padStart(2,"0"); return p(Math.floor(s/3600))+":"+p(Math.floor(s%3600/60))+":"+p(s%60); }
+  try{
+    const r=await fetch("/api/ctf/scoreboard"); const d=await r.json();
+    const rk=(d&&d.ok?d.ranking:[]);
+    if(rk.length){
+      document.getElementById("leadPts").innerHTML=`🥇 <b>${rk[0].name}</b> (${rk[0].pts} pts)`;
+
+      const ef=[...rk].filter(x=>x.solves>=10).map(x=>({x,idx:(x.pts/Math.max((x.time||0)/3600000,1/60))*2})).sort((a,b)=>b.idx-a.idx)[0];
+      document.getElementById("leadEfic").innerHTML=ef?`🥇 <b>${ef.x.name}</b> (índice ${ef.idx.toFixed(1)})`:`<span class="muted">Ninguém com 10+ fases.</span>`;
+    } else {
+      ["leadPts","leadTime","leadEfic"].forEach(id=>document.getElementById(id).innerHTML=`<span class="muted">Sem jogadores ainda.</span>`);
+    }
+  }catch(e){}
+  try{
+    const r2=await fetch("/api/ctf/scoreboard"); const d2=await r2.json();
+    const done=(d2&&d2.ok?d2.ranking:[]).filter(x=>x.solves>=101&&x.time!=null).sort((a,b)=>a.time-b.time)[0];
+    document.getElementById("leadFinal").innerHTML=done?`👑 <b>${done.name}</b> (${fmt(done.time)})`:`<span class="muted">Ninguém zerou as 101 ainda.</span>`;
+  }catch(e){ document.getElementById("leadFinal").innerHTML=`<span class="muted">—</span>`; }
+  try{
+    const r=await fetch("/api/ctf/team/ranking"); const d=await r.json();
+    const t=(d&&d.ok?d.teams:[]);
+    document.getElementById("leadTeam").innerHTML=t.length?`🥇 <b>${t[0].team}</b> (${t[0].pts} pts)`:`<span class="muted">Sem equipes ainda.</span>`;
+  }catch(e){}
+})();
+</script>
+
+<section class="wrap lab" id="patrocinadores">
+  <h2 data-i18n="spon.t">🤝 Patrocinadores</h2>
+  <p class="muted">Espaço reservado para patrocinadores — sua marca aqui.</p>
+  <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(160px,1fr))">
+    <div class="card"><h3>Seu logo aqui</h3><p class="muted">Patrocinador 1</p></div>
+    <div class="card"><h3>Seu logo aqui</h3><p class="muted">Patrocinador 2</p></div>
+    <div class="card"><h3>Seu logo aqui</h3><p class="muted">Patrocinador 3</p></div>
+    <div class="card"><h3>Seu logo aqui</h3><p class="muted">Patrocinador 4</p></div>
+  </div>
+</section>
+
+<div class="wrap lab" style="text-align:center">
+  <a class="btn primary" href="arena.html" style="font-size:18px;padding:14px 28px">⚔ Entrar na arena — 101 desafios →</a>
+  <p class="muted" style="margin-top:10px">Conta, equipe e ranking ficam em <a href="conta.html"><span data-i18n="nav.conta">Conta</span></a> • <a href="ranking.html"><span data-i18n="nav.ranking">Ranking</span></a> • <a href="regras.html"><span data-i18n="nav.regras">Regras</span></a></p>
+</div>
+
+<div class="wrap">
+  <div class="warn" style="text-align:center">
+    <p>📜 Jogando o CTF-ES? <a href="regras.html"><b>Leia as regras oficiais →</b></a> • <a href="arena.html"><b>Ir para a arena →</b></a></p>
+  </div>
+  <footer class="footer" style="text-align:center">
+    <p>CTF-ES • 101 desafios educacionais. Feito para estudar Web, Crypto, Forense e Reverso na faculdade.</p>
+  </footer>
+</div>
+
+</body>
+</html>

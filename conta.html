@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CTF-ES — Minha Conta</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚑</text></svg>">
+<link rel="stylesheet" href="ctf.css?v=35">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;800&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<script src="lang.js?v=35"></script>
+</head>
+<body>
+<header class="topbar">
+  <div class="wrap topbar-inner">
+    <div class="logo"><span class="logo-icon">⚑</span> CTF-<span class="accent">ES</span> <small>CONTA</small></div>
+    <a class="btn ghost sm home-m" href="ctf.html">🏠</a>
+    <nav class="nav">
+      <a href="ctf.html"><span data-i18n="nav.inicio">Início</span></a>
+      <a href="arena.html"><span data-i18n="nav.arena">Arena</span></a>
+      <a href="ranking.html"><span data-i18n="nav.ranking">Ranking</span></a>
+      <a href="regras.html"><span data-i18n="nav.regras">Regras</span></a>
+    </nav>
+    <span class="langBox" style="display:flex;gap:4px"></span>
+    <div class="player-box">
+      <span id="netStatus" style="font-size:11px">…</span>
+      <span id="playerName">Visitante</span>
+      <button class="btn ghost sm hidden" id="btnSair" onclick="logout()">⏻ sair</button>
+    </div>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="wrap hero-center">
+    <div class="eyebrow" data-i18n="acc.hero">CONTA • EQUIPE • PAINEL ADM</div>
+    <h1>👤 <span class="grad" data-i18n="acc.heroT">Minha conta</span></h1>
+    <p class="subtitle" data-i18n="acc.heroS">Entre, troque a senha, gerencie sua equipe. O painel ADM aparece sozinho pra quem é admin.</p>
+  </div>
+</section>
+
+<div class="wrap lab">
+  <div class="rank-grid">
+    <div class="card">
+      <h3 id="authTitle" data-i18n="acc.entrar">Entrar / Criar conta</h3>
+      <div id="authForm">
+      <div class="row"><input id="authUser" data-i18n-ph="acc.userPh" placeholder="usuário (3-20 letras/números)" autocomplete="username"></div>
+      <div class="row" style="margin-top:8px"><input id="authPass" type="password" data-i18n-ph="acc.passPh" placeholder="senha (mín. 4)" autocomplete="current-password"></div>
+      <div class="row" style="margin-top:8px"><input id="authTeam" data-i18n-ph="acc.teamPh" placeholder="equipe (opcional)" maxlength="20" autocomplete="off"></div>
+      <div class="row" style="margin-top:8px"><input id="authEmail" type="email" data-i18n-ph="acc.emailPh" placeholder="e-mail (p/ recuperar senha)" autocomplete="email"></div>
+      <div class="row" style="margin-top:8px">
+        <button class="btn primary" onclick="register()" data-i18n="acc.criar">📝 Criar conta</button>
+        <button class="btn ghost" onclick="login()" data-i18n="acc.login">🔑 Entrar</button>
+      </div>
+      <div class="row" style="margin-top:6px"><button class="btn ghost sm" onclick="abrirForgot()" data-i18n="acc.esqueci">Esqueci a senha</button></div>
+      </div>
+<!-- MODAL ESQUECI A SENHA -->
+<div id="forgotModal" class="modal hidden">
+  <div class="modal-box" style="max-width:380px">
+    <div class="modal-head">
+      <div><span class="cat" data-i18n="acc.recT">recuperar</span></div>
+      <button class="btn ghost sm" onclick="fecharForgot()">✕</button>
+    </div>
+    <h2 data-i18n="acc.recH">🔑 Esqueci a senha</h2>
+    <div class="row"><input id="fgUser" placeholder="seu usuário" autocomplete="username"></div>
+    <div class="row" style="margin-top:8px"><button class="btn primary" onclick="forgotSend()" data-i18n="acc.recSend">📧 Enviar código</button></div>
+    <div class="row" style="margin-top:8px"><input id="fgCode" placeholder="código de 6 dígitos" maxlength="6" autocomplete="off"></div>
+    <div class="row" style="margin-top:8px"><input id="fgNew" type="password" data-i18n-ph="acc.newPh" placeholder="nova senha (mín. 4)" autocomplete="new-password"></div>
+    <div class="row" style="margin-top:8px"><button class="btn ghost" onclick="forgotReset()" data-i18n="acc.recSave">💾 Trocar com código</button></div>
+    <div id="fgMsg" class="out"></div>
+  </div>
+</div>
+      <div id="authMsg" class="out"></div>
+      <div id="passBox" class="hidden" style="margin-top:8px;border-top:1px dashed var(--line);padding-top:10px">
+        <h3 style="font-size:14px" data-i18n="acc.trocar">🔑 Trocar senha</h3>
+        <div class="row" style="margin-top:6px"><input id="curPass" type="password" data-i18n-ph="acc.curPh" placeholder="senha atual" autocomplete="current-password"></div>
+        <div class="row" style="margin-top:8px"><input id="newPass" type="password" data-i18n-ph="acc.newPh" placeholder="nova senha (mín. 4)" autocomplete="new-password"></div>
+        <div class="row" style="margin-top:8px"><button class="btn ghost sm" onclick="trocarSenha()" data-i18n="acc.salvar">💾 Salvar nova senha</button></div>
+        <div id="passMsg" class="out"></div>
+      </div>
+      <div id="myRank" class="out"><span class="muted">Entre ou crie uma conta.</span></div>
+      <div id="delBox" class="hidden" style="margin-top:8px">
+        <button class="btn ghost sm" onclick="deletarConta()" data-i18n="acc.del">🗑 Excluir minha conta</button>
+      </div>
+    </div>
+    <div class="card">
+      <h3><span data-i18n="acc.teamT">👥 Minha equipe</span> <span class="muted" style="font-size:11px" data-i18n="acc.max4">(máx 4)</span></h3>
+      <div id="teamBox" class="out"><span class="muted">Entre na conta para ver.</span></div>
+    </div>
+  </div>
+</div>
+
+<section id="admin" class="wrap lab hidden">
+  <h2 data-i18n="adm.t">🛡️ Painel ADM</h2>
+  <p class="muted" data-i18n="adm.soviso">Visível só para <b>admin</b>.</p>
+  <div class="hud" style="justify-content:flex-start">
+    <div class="hud-card"><strong id="admUsers">0</strong><span data-i18n="adm.users">contas</span></div>
+    <div class="hud-card"><strong id="admSolves">0</strong><span data-i18n="adm.solves">flags validadas</span></div>
+    <div class="hud-card"><strong id="admPontos">0</strong><span data-i18n="adm.pts">pontos distribuídos</span></div>
+    <div class="hud-card"><strong id="admOnline">0</strong><span data-i18n="adm.online">🟢 online agora</span></div>
+  </div>
+  <div class="card">
+    <h3 data-i18n="adm.usersT">👥 Jogadores</h3>
+    <div style="overflow:auto"><table class="adm-table">
+      <thead><tr><th data-i18n="adm.thUser">Usuário</th><th>IP</th><th data-i18n="adm.thPapel">Papel</th><th>Pts</th><th>Solves</th><th data-i18n="adm.thPrints">🖨️ Prints</th><th data-i18n="adm.thCriado">Criado em</th><th data-i18n="adm.thAcoes">Ações</th></tr></thead>
+      <tbody id="admBody"></tbody>
+    </table></div>
+    <div class="term-btns">
+      <button class="mini" onclick="adminResetAll()" data-i18n="adm.zPts">↺ Zerar pontos de TODOS</button>
+      <button class="mini" onclick="adminResetTimes()" data-i18n="adm.zTime">⏱ Zerar tempos de TODOS</button>
+      <button class="mini" onclick="adminTeamsClear()" data-i18n="adm.delTeams">👥 Apagar TODAS equipes</button>
+      <button class="mini" onclick="adminBackup()" data-i18n="adm.exp">💾 Exportar backup (JSON)</button>
+      <button class="mini" onclick="document.getElementById('admFile').click()" data-i18n="adm.imp">📂 Importar backup</button>
+      <input id="admFile" type="file" accept=".json" style="display:none" onchange="adminRestore(this)">
+    </div>
+  </div>
+  <div class="card" style="margin-top:14px">
+    <h3>👥 Equipes</h3>
+    <div id="admTeams" class="out"><span class="muted">…</span></div>
+  </div>
+  <div class="card" style="margin-top:14px">
+    <h3>👁️ Visitantes observando</h3>
+    <p class="muted">IPs capturados + tempo de permanência no site (salvo em disco).</p>
+    <div id="admVisit" class="out"><span class="muted">…</span></div>
+  </div>
+  <div class="card" style="margin-top:14px">
+    <h3>🚫 Trapaceiros</h3>
+    <p class="muted">🤖 <b>Automático:</b> 3 Prints Screens e a conta cai aqui sozinha. ✋ <b>Manual:</b> marque quem colou ou usou IA, com o motivo.</p>
+    <div id="cheatList" class="out"></div>
+  </div>
+</section>
+
+<div class="wrap lab">
+  <h2>🚫 Lista de trapaceiros</h2>
+  <p class="muted">Quem cola, vaza print ou usa IA continua no ranking, mas carimbado de 🚫 com o motivo aqui.</p>
+  <div class="card"><div id="cheatPublic" class="out"></div></div>
+  <footer class="footer"><p>CTF-ES • <a href="arena.html">Voltar à arena →</a> <span id="admDot" onclick="abrirAdmLogin()" title="">·</span></p></footer>
+</div>
+
+<div id="admModal" class="modal hidden">
+  <div class="modal-box" style="max-width:380px">
+    <div class="modal-head">
+      <div><span class="cat">restrito</span></div>
+      <button class="btn ghost sm" onclick="fecharAdmLogin()">✕</button>
+    </div>
+    <h2>🔒</h2>
+    <div class="row"><input id="admUser" placeholder="usuário" autocomplete="off"></div>
+    <div class="row" style="margin-top:8px"><input id="admPass" type="password" placeholder="senha" onkeydown="if(event.key==='Enter')adminLogin()"></div>
+    <div class="row" style="margin-top:8px"><button class="btn primary" onclick="adminLogin()">Entrar</button></div>
+    <div id="admMsg" class="out"></div>
+  </div>
+</div>
+
+<div id="toast" class="toast hidden"></div>
+
+<script>
+let TOKEN=localStorage.getItem("ctf_token")||null, ME=null, ONLINE=false, currentUser=null;
+function toast(t){ const e=document.getElementById("toast"); e.textContent=t; e.classList.remove("hidden"); clearTimeout(e._t); e._t=setTimeout(()=>e.classList.add("hidden"),2600); }
+function fmtTime(ms){ if(ms==null||!isFinite(ms)) return "—"; const s=Math.floor(ms/1000); const p=n=>String(n).padStart(2,"0"); return p(Math.floor(s/3600))+":"+p(Math.floor(s%3600/60))+":"+p(s%60); }
+async function apiGet(p,ms){ const c=new AbortController(); const t=setTimeout(()=>c.abort(),ms||8000); try{ const r=await fetch(p,{signal:c.signal}); return await r.json(); }catch(e){ return null; }finally{ clearTimeout(t); } }
+async function apiPost(p,b,ms){ const c=new AbortController(); const t=setTimeout(()=>c.abort(),ms||10000); try{ const r=await fetch(p,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(b||{}),signal:c.signal}); return await r.json(); }catch(e){ return null; }finally{ clearTimeout(t); } }
+function authMsg(t,ok){ document.getElementById("authMsg").innerHTML=`<div class="live ${ok?"ok":"no"}">${t}</div>`; }
+function updateWatermark(){ /* selo apenas na arena (ctf.html) */ return; }
+function isAdmin(){ return !!(ME&&ME.role==="admin"); }
+async function syncMe(){
+  const me=await apiGet("/api/ctf/me?token="+encodeURIComponent(TOKEN||""));
+  if(!me||!me.ok) return false;
+  ME=me; currentUser=me.user;
+  localStorage.setItem("ctf_session",currentUser); localStorage.setItem("ctf_name",currentUser);
+  paintSession(); renderMe(); renderTeam(); renderAdmin(); renderCheaters(); updateWatermark();
+  return true;
+}
+function paintSession(){
+  document.getElementById("playerName").textContent=currentUser?currentUser+(isAdmin()?" 👑":""):T("acc.visitante");
+  document.getElementById("btnSair").classList.toggle("hidden",!currentUser);
+  document.getElementById("authTitle").textContent=currentUser?(T("acc.loggedAs")+" "+currentUser):T("acc.entrar");
+  document.getElementById("authForm").classList.toggle("hidden",!!currentUser);
+  document.getElementById("delBox").classList.toggle("hidden",!currentUser);
+  document.getElementById("passBox").classList.toggle("hidden",!currentUser);
+}
+function renderMe(){
+  const mr=document.getElementById("myRank");
+  if(!mr) return;
+  const _rt=(currentUser&&ME&&ME.ritmo)||{};
+  const _rr=k=>{ const v=_rt[k]; if(v==null) return "—"; const s=Math.floor(v/1000); const p=n=>String(n).padStart(2,"0"); return p(Math.floor(s/3600))+":"+p(Math.floor(s%3600/60))+":"+p(s%60); };
+  mr.innerHTML=(currentUser&&ME)
+    ? `<div class="live ok">👤 <b>${currentUser}</b>${isAdmin()?" 👑 ADM":""} — ${ME.pts} pts ⏱ ${fmtTime(Date.now()-ME.start)} 🌐<br><span class="muted">`+T("rk.pace")+` 🟢 ${_rr("facil")} • 🟡 ${_rr("medio")} • 🔴 ${_rr("avancado")}</span></div>`
+    : `<div class="live">👤 `+T("acc.visitante")+` — <b>`+T("acc.meGo")+`</b></div>`;
+}
+async function autoTeam(){
+  const t=(document.getElementById("authTeam").value||"").trim();
+  if(!t) return "";
+  let r=await apiPost("/api/ctf/team/create",{token:TOKEN,name:t});
+  if(r&&r.ok){ await renderTeam(); return ` 👥 Equipe <b>${t}</b> `+T("acc.teamMade2"); }
+  if(r&&/ja existe/i.test(r.error||"")){
+    r=await apiPost("/api/ctf/team/request",{token:TOKEN,name:t});
+    if(r&&r.ok){ await renderTeam(); return ` 📨 `+T("acc.reqSent2")+` <b>${t}</b>`; }
+  }
+  await renderTeam();
+  return ` ⚠️ `+T("acc.teamErr2")+((r&&r.error)||"?");
+}
+async function register(){
+  const u=(document.getElementById("authUser").value||"").trim(), p=document.getElementById("authPass").value||"";
+  const em=(document.getElementById("authEmail")||{}).value||"";
+  const r=await apiPost("/api/ctf/register",{user:u,pass:p,email:em});
+  if(!r) return authMsg(T("acc.srvDown"),false);
+  if(!r.ok) return authMsg("❌ "+((r&&r.error)||T("acc.failWords")),false);
+  TOKEN=r.token; localStorage.setItem("ctf_token",TOKEN); await syncMe();
+  const tm=await autoTeam();
+  authMsg("✅ <b>"+u+"</b>: "+T("acc.created")+tm,true);
+}
+async function login(){
+  const u=(document.getElementById("authUser").value||"").trim(), p=document.getElementById("authPass").value||"";
+  const r=await apiPost("/api/ctf/login",{user:u,pass:p});
+  if(!r) return authMsg("❌ Servidor fora do ar.",false);
+  if(!r.ok) return authMsg("❌ "+(r.error||T("acc.failWords")),false);
+  if(r.role==="admin") return authMsg(T("acc.notFound"),false);
+  TOKEN=r.token; localStorage.setItem("ctf_token",TOKEN); await syncMe();
+  const tm=await autoTeam();
+  authMsg("✅ "+T("acc.welcome")+", <b>"+u+"</b>! 🌐"+tm,true);
+}
+function abrirForgot(){ document.getElementById("forgotModal").classList.remove("hidden"); document.getElementById("fgMsg").innerHTML=""; }
+function fecharForgot(){ document.getElementById("forgotModal").classList.add("hidden"); }
+function fgMsg(t,ok){ document.getElementById("fgMsg").innerHTML=`<div class="live ${ok?"ok":"no"}">${t}</div>`; }
+async function forgotSend(){
+  const u=(document.getElementById("fgUser").value||"").trim();
+  if(!u) return fgMsg("Digite seu usuário.",false);
+  fgMsg("⏳ Enviando...",true);
+  const r=await apiPost("/api/ctf/forgot",{user:u});
+  if(!r||!r.ok) return fgMsg("❌ "+((r&&r.error)||"falha"),false);
+  fgMsg(T("acc.codeSent"),true);
+}
+async function forgotReset(){
+  const u=(document.getElementById("fgUser").value||"").trim();
+  const c=(document.getElementById("fgCode").value||"").trim();
+  const n=document.getElementById("fgNew").value||"";
+  const r=await apiPost("/api/ctf/reset_code",{user:u,code:c,new:n});
+  if(!r||!r.ok) return fgMsg("❌ "+((r&&r.error)||"falha"),false);
+  fgMsg(T("acc.passReset"),true);
+}
+async function deletarConta(){
+  if(!confirm(T("acc.delQ"))) return;
+  const pw=prompt(T("acc.delPass"));
+  if(!pw) return;
+  const r=await apiPost("/api/ctf/delete_account",{token:TOKEN,pass:pw,confirm:true});
+  if(!r||!r.ok){ toast(T("acc.fail")+": "+((r&&r.error)||"?")); return; }
+  TOKEN=null; ME=null; currentUser=null;
+  localStorage.removeItem("ctf_token"); localStorage.removeItem("ctf_session");
+  paintSession(); renderMe(); renderTeam(); renderAdmin(); renderCheaters(); updateWatermark();
+  toast(T("acc.deleted"));
+}
+function logout(){
+  if(TOKEN) apiPost("/api/ctf/logout",{token:TOKEN});
+  TOKEN=null; ME=null; currentUser=null;
+  localStorage.removeItem("ctf_token"); localStorage.removeItem("ctf_session");
+  paintSession(); renderMe(); renderTeam(); renderAdmin(); renderCheaters(); updateWatermark();
+  toast(T("acc.bye"));
+}
+async function trocarSenha(){
+  const cur=document.getElementById("curPass").value||"", nw=document.getElementById("newPass").value||"";
+  const box=document.getElementById("passMsg");
+  const r=await apiPost("/api/ctf/password",{token:TOKEN,cur:cur,new:nw});
+  if(!r||!r.ok){ box.innerHTML=`<div class="live no">❌ ${((r&&r.error)||T("acc.failWords"))}.</div>`; return; }
+  document.getElementById("curPass").value=""; document.getElementById("newPass").value="";
+  box.innerHTML=`<div class="live ok">${T("acc.passOk")}</div>`;
+}
+async function renderTeam(){
+  const box=document.getElementById("teamBox"); if(!box) return;
+  if(!ONLINE||!currentUser||!TOKEN){ box.innerHTML=`<span class="muted">${T("acc.noTeam")}</span>`; return; }
+  const d=await apiGet("/api/ctf/team/my?token="+encodeURIComponent(TOKEN));
+  if(!d||!d.ok){ box.innerHTML=`<span class="muted">${T("acc.teamErr")}</span>`; return; }
+  if(!d.team){
+    const pend=(d.myRequests||[]).map(t=>`<div class="live">📨 ${T("acc.pending")} <b>${t}</b> <button class="mini" onclick="teamCancel('${t}')">`+T("acc.cancel")+`</button></div>`).join("");
+    box.innerHTML=`<div class="row"><input id="teamName" data-i18n-ph="acc.teamPh2" placeholder="nome da equipe" maxlength="20"></div>
+    <div class="row" style="margin-top:8px"><button class="btn primary sm" onclick="teamCreate()">`+T("acc.createTeam")+`</button><button class="btn ghost sm" onclick="teamRequest()">`+T("acc.askJoin")+`</button></div>
+    <div id="teamMsg" class="out"></div>${pend}<span class="muted">Criar = você vira líder. Pedir entrada = o líder aceita ou recusa. (máx 4).</span>`;
+    return;
+  }
+  const info=d.info||{};
+  const isLeader=d.leader===currentUser;
+  const reqs=(d.requests||[]).map(r=>`<div class="live">📨 <b>${r.user}</b> quer entrar <span style="opacity:.6">(${r.date||""})</span> <button class="mini" onclick="teamAccept('${r.user}')">✅ Aceitar</button> <button class="mini" onclick="teamRefuse('${r.user}')">❌ Recusar</button></div>`).join("");
+  box.innerHTML=`<div class="live ok">👥 <b>${d.team}</b>${isLeader?" 👑 (você lidera)":""} — ${info.pts??0} pts ⏱ ${fmtTime(info.time)}</div>
+  <div class="live">`+T("acc.members")+` (${(d.members||[]).length}/4): <b>${(d.members||[]).join(", ")}</b></div>
+  ${isLeader&&reqs?`<div class="live">⏳ <b>Pedidos de entrada:</b></div>`+reqs:isLeader?`<span class="muted">${T("acc.noPend")}</span>`:""}
+  <div class="row" style="margin-top:8px"><button class="btn ghost sm" onclick="teamLeave()">`+T("acc.leave")+`</button><a class="btn ghost sm" href="ranking.html#equipes">`+T("acc.seeRank")+`</a></div>
+  <div id="teamMsg" class="out"></div>`;
+}
+async function teamCreate(){ const n=(document.getElementById("teamName").value||"").trim(); const r=await apiPost("/api/ctf/team/create",{token:TOKEN,name:n}); const e=document.getElementById("teamMsg"); if(!r||!r.ok){ if(e) e.innerHTML=`<div class="live no">❌ `+((r&&r.error)||T("acc.failWords"))+"</div>"; return; } toast(T("acc.teamMade")); renderTeam(); }
+async function teamRequest(){ const n=(document.getElementById("teamName").value||"").trim(); const r=await apiPost("/api/ctf/team/request",{token:TOKEN,name:n}); const e=document.getElementById("teamMsg"); if(!r||!r.ok){ if(e) e.innerHTML=`<div class="live no">❌ `+((r&&r.error)||T("acc.failWords"))+"</div>"; return; } toast(T("acc.reqSent")); renderTeam(); }
+async function teamCancel(t){ const n=t||((document.getElementById("teamName")||{}).value||"").trim(); await apiPost("/api/ctf/team/cancel",{token:TOKEN,name:n}); renderTeam(); }
+async function teamAccept(u){ const r=await apiPost("/api/ctf/team/accept",{token:TOKEN,user:u}); const e=document.getElementById("teamMsg"); if(!r||!r.ok){ if(e) e.innerHTML=`<div class="live no">❌ `+((r&&r.error)||T("acc.failWords"))+"</div>"; return; } toast("✅ "+u+" "+T("acc.entered")); renderTeam(); }
+async function teamRefuse(u){ const r=await apiPost("/api/ctf/team/refuse",{token:TOKEN,user:u}); const e=document.getElementById("teamMsg"); if(!r||!r.ok){ if(e) e.innerHTML=`<div class="live no">❌ `+((r&&r.error)||T("acc.failWords"))+"</div>"; return; } toast(T("acc.refusedP")+u); renderTeam(); }
+async function teamLeave(){ if(!confirm(T("acc.leaveQ"))) return; await apiPost("/api/ctf/team/leave",{token:TOKEN}); renderTeam(); }
+async function renderAdmin(){
+  const sec=document.getElementById("admin"); if(!sec) return;
+  if(!isAdmin()){ sec.classList.add("hidden"); return; }
+  sec.classList.remove("hidden");
+  const d=await apiGet("/api/ctf/admin/users?token="+encodeURIComponent(TOKEN||""));
+  if(!d||!d.ok) return;
+  const rows=d.users||[];
+  document.getElementById("admUsers").textContent=rows.length;
+  document.getElementById("admSolves").textContent=rows.reduce((a,r)=>a+(r.solves||0),0);
+  document.getElementById("admPontos").textContent=rows.reduce((a,r)=>a+(r.pts||0),0);
+  document.getElementById("admOnline").textContent=rows.filter(r=>r.online).length;
+  document.getElementById("admSolves").textContent=rows.reduce((a,r)=>a+(r.solves||0),0);
+  document.getElementById("admPontos").textContent=rows.reduce((a,r)=>a+(r.pts||0),0);
+  const banned=new Set((d.cheaters||[]).map(c=>c.name));
+  document.getElementById("admBody").innerHTML=rows.map(r=>`<tr><td>${r.online?"🟢":"⚫"} <b>${r.name}</b>${banned.has(r.name)?' <span class="badge-adm">TRAPAÇA</span>':""}${r.banned?' <span class="badge-adm">🔒 BLOQ</span>':""}${r.role==="admin"?" 👑":""}</td><td style="font-size:11px">${r.lastIp||r.ip||"—"}</td><td>${r.role}</td><td>${r.pts}</td><td>${r.solves}</td><td>${r.prints?`🖨️ ${r.prints}×`:"—"}</td><td>${r.created||"-"}</td><td><button class="mini" onclick="adminResetUser('${r.name}')">↺</button>${banned.has(r.name)?` <button class="mini" onclick="adminUnflagCheater('${r.name}')" title="Perdoar (mantém pontos)">✅</button>`:r.name!==currentUser?` <button class="mini" onclick="adminFlagCheater('${r.name}')">🚫</button>`:""}${r.name!==currentUser?` <button class="mini" onclick="adminResetPass('${r.name}')" title="Gerar senha temporária">🔑</button> <button class="mini" onclick="adminBan('${r.name}',${r.banned?0:1})" title="${r.banned?"Desbloquear":"Bloquear"}">${r.banned?"🔓":"🔒"}</button> <button class="mini" onclick="adminPrintsClear('${r.name}')" title="Limpar prints e multas">🧹</button> <button class="mini" onclick="adminDeleteUser('${r.name}')">✕</button>`:""}</td></tr>`).join("");
+  renderCheaters(); renderAdminTeams(); renderVisit();
+}
+function fmtDur(ms){ if(ms==null) return "—"; const s=Math.floor(ms/1000); const p=n=>String(n).padStart(2,"0"); return p(Math.floor(s/3600))+":"+p(Math.floor(s%3600/60))+":"+p(s%60); }
+async function renderVisit(){
+  const box=document.getElementById("admVisit"); if(!box) return;
+  if(!isAdmin()){ box.innerHTML=`<span class="muted">🔒 Área restrita ao ADM.</span>`; return; }
+  const d=await apiGet("/api/ctf/admin/visitors?token="+encodeURIComponent(TOKEN||""));
+  const vs=(d&&d.ok?d.visitors:[]);
+  box.innerHTML=vs.length?`<div style="overflow:auto"><table class="adm-table"><thead><tr><th></th><th>ID</th><th>IP</th><th>Visitas</th><th>Tempo observando</th><th>Visto por último</th></tr></thead><tbody>`+vs.map(v=>`<tr><td>${v.online?"🟢":"⚫"}</td><td><b>${v.id}…</b></td><td>${v.ip}</td><td>${v.visits||1}x</td><td>${fmtDur(v.active)}</td><td>${new Date(v.last*1000).toLocaleString("pt-BR")}</td></tr>`).join("")+`</tbody></table></div>`:`<span class="muted">Nenhum visitante capturado ainda.</span>`;
+}
+async function renderAdminTeams(){
+  const box=document.getElementById("admTeams"); if(!box) return;
+  const d=await apiGet("/api/ctf/team/ranking"); const teams=(d&&d.ok?d.teams:[]);
+  box.innerHTML=teams.length?teams.map(t=>`<div class="live">👥 <b>${t.team}</b> — ${t.pts} pts (${t.n}/4): ${t.members.join(", ")} <button class="mini" onclick="adminTeamReset('${t.team}')" title="Zerar pontos da equipe">↺</button> <button class="mini" onclick="adminTeamTimes('${t.team}')" title="Zerar tempos da equipe">⏱</button> <button class="mini" onclick="adminTeamDel('${t.team}')">✕</button></div>`).join(""):`<span class="muted">${T("acc.noTeam2")}</span>`;
+}
+async function adminResetUser(n){ if(!confirm(T("acc.resetU")+n+"?")) return; await apiPost("/api/ctf/admin/reset",{token:TOKEN,user:n}); if(n===currentUser) await syncMe(); renderAdmin(); }
+async function adminDeleteUser(n){ if(!confirm(T("acc.delU")+n+"?")) return; await apiPost("/api/ctf/admin/delete",{token:TOKEN,user:n}); renderAdmin(); }
+async function adminPrintsClear(n){ if(!confirm(T("acc.clearPQ")+n+"?")) return; await apiPost("/api/ctf/admin/prints_clear",{token:TOKEN,user:n}); renderAdmin(); toast(T("acc.cleared")); }
+async function adminBan(n,ligar){
+  const acao=ligar?T("acc.banW"):T("acc.unbanW");
+  const extra=ligar?T("acc.banX"):"";
+  if(!confirm(acao+" "+n+"?"+extra)) return;
+  await apiPost("/api/ctf/admin/ban",{token:TOKEN,user:n,on:!!ligar});
+  renderAdmin();
+  toast(ligar?T("acc.banned"):T("acc.unbanned"));
+}
+async function adminResetPass(n){
+  if(!confirm(T("acc.passQ")+n+T("acc.passQ2"))) return;
+  const r=await apiPost("/api/ctf/admin/passwd",{token:TOKEN,user:n});
+  if(!r||!r.ok){ toast(T("acc.fail")); return; }
+  prompt(T("acc.passShow")+n+T("acc.passCopy"), r.temp);
+}
+async function adminTeamDel(t){ if(!confirm(T("acc.teamDelQ")+t+"?")) return; await apiPost("/api/ctf/admin/team_delete",{token:TOKEN,team:t}); renderAdmin(); renderTeam(); }
+async function adminTeamTimes(t){ if(!confirm(T("acc.teamTimeQ")+t+"?")) return; await apiPost("/api/ctf/admin/team_times",{token:TOKEN,team:t}); renderAdmin(); toast(T("acc.teamTimeDone")); }
+async function adminTeamReset(t){ if(!confirm(T("acc.teamZeroQ")+t+"?")) return; await apiPost("/api/ctf/admin/team_reset",{token:TOKEN,team:t}); renderAdmin(); toast(T("acc.teamZeroed")); }
+async function adminFlagCheater(n){ const m=prompt(T("acc.flagQ")); if(!m||!m.trim()) return; await apiPost("/api/ctf/admin/flag",{token:TOKEN,user:n,reason:m.trim().slice(0,140)}); renderAdmin(); renderCheaters(); }
+async function adminUnflagCheater(n){ await apiPost("/api/ctf/admin/unflag",{token:TOKEN,user:n}); renderAdmin(); renderCheaters(); }
+async function adminResetAll(){ if(!confirm(T("acc.resetAllQ"))) return; await apiPost("/api/ctf/admin/reset_all",{token:TOKEN}); await syncMe(); renderAdmin(); }
+async function adminResetTimes(){ if(!confirm(T("acc.resetTimesQ"))) return; await apiPost("/api/ctf/admin/reset_times",{token:TOKEN}); await syncMe(); renderAdmin(); toast(T("acc.timesDone")); }
+async function adminTeamsClear(){ if(!confirm(T("acc.delTeamsQ"))) return; await apiPost("/api/ctf/admin/teams_clear",{token:TOKEN}); renderAdmin(); toast(T("acc.teamsGone")); }
+async function adminBackup(){ const d=await apiGet("/api/ctf/admin/users?token="+encodeURIComponent(TOKEN||"")); const b=new Blob([JSON.stringify(d,null,2)],{type:"application/json"}); const a=document.createElement("a"); a.href=URL.createObjectURL(b); a.download="ctf-backup.json"; a.click(); }
+function adminRestore(){ toast(T("acc.impArena")); }
+async function renderCheaters(){
+  const d=await apiGet("/api/ctf/cheaters"); const arr=(d&&d.ok?d.cheaters:[]);
+  paint(arr);
+  function paint(a){
+    const pub=document.getElementById("cheatPublic");
+    if(pub) pub.innerHTML=a.length?a.map(c=>`<div class="live no">🚫 <b>${c.name}</b> — ${c.reason} <span style="opacity:.6">(${c.date})</span></div>`).join(""):`<span class="muted">${T("acc.fair")}</span>`;
+    const adm=document.getElementById("cheatList");
+    if(adm) adm.innerHTML=isAdmin()?(a.length?a.map(c=>`<div class="live no">🚫 <b>${c.name}</b> — ${c.reason} <button class="mini" onclick="adminUnflagCheater('${c.name}')">`+T("acc.pardon")+`</button></div>`).join(""):`<span class="muted">${T("acc.emptyList")}</span>`):`<span class="muted">${T("acc.lockedArea")}</span>`;
+  }
+}
+function abrirAdmLogin(){ document.getElementById("admModal").classList.remove("hidden"); document.getElementById("admMsg").innerHTML=""; }
+function fecharAdmLogin(){ document.getElementById("admModal").classList.add("hidden"); }
+async function adminLogin(){
+  const u=(document.getElementById("admUser").value||"").trim(), p=document.getElementById("admPass").value||"";
+  const r=await apiPost("/api/ctf/login",{user:u,pass:p});
+  if(!r||!r.ok||r.role!=="admin"){ document.getElementById("admMsg").innerHTML=`<div class="live no">${T("acc.denied")}</div>`; return; }
+  TOKEN=r.token; localStorage.setItem("ctf_token",TOKEN); fecharAdmLogin(); await syncMe();
+  document.getElementById("admin").scrollIntoView({behavior:"smooth"});
+}
+let _pwAt=0;
+function mostrarAvisoPrint(){ /* aviso de print apenas na arena */ return; }
+function fecharAvisoPrint(){ return; }
+(async function init(){
+  const h=await apiGet("/api/health",6000); ONLINE=!!(h&&h.ok);
+  document.getElementById("netStatus").textContent=ONLINE?"🌐 online":"📴 offline";
+  if(ONLINE&&TOKEN){ if(!(await syncMe())){ TOKEN=null; localStorage.removeItem("ctf_token"); } }
+  if(!ONLINE){ document.getElementById("authMsg").innerHTML=`<div class="live no">📴 Conta e equipes exigem o servidor online.</div>`; }
+  paintSession(); renderMe(); renderTeam(); renderAdmin(); renderCheaters(); updateWatermark();
+  document.getElementById("admModal").addEventListener("click",e=>{ if(e.target.id==="admModal") fecharAdmLogin(); });
+  document.getElementById("forgotModal").addEventListener("click",e=>{ if(e.target.id==="forgotModal") fecharForgot(); });
+  // presença online (ping leve, não conta tempo)
+  let _vid=null; try{ _vid=localStorage.getItem("ctf_vid"); if(!_vid){ _vid=Math.random().toString(36).slice(2)+Date.now().toString(36); localStorage.setItem("ctf_vid",_vid); } }catch(e){}
+  const _vp=()=>{ try{ fetch("/api/ctf/ping",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({vid:_vid})}).catch(()=>{}); }catch(e){} };
+  _vp();
+  setInterval(()=>{ const t=localStorage.getItem("ctf_token"); if(t) fetch("/api/ctf/beat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({token:t})}).catch(()=>{}); _vp(); if(isAdmin()) renderAdmin(); },60000);
+  document.addEventListener("keydown",e=>{ if(e.key==="Escape"){ fecharAdmLogin(); fecharAvisoPrint(); } });
+})();
+</script>
+</body>
+</html>

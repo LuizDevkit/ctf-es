@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CTF-ES — Ranking Oficial</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚑</text></svg>">
+<link rel="stylesheet" href="ctf.css?v=34">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;800&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<script src="lang.js?v=34"></script>
+</head>
+<body>
+<header class="topbar">
+  <div class="wrap topbar-inner">
+    <div class="logo"><span class="logo-icon">⚑</span> CTF-<span class="accent">ES</span> <small>RANKING</small></div>
+    <a class="btn ghost sm home-m" href="ctf.html">🏠</a>
+    <nav class="nav"><a href="ctf.html"><span data-i18n="nav.inicio">🏠 Início</span></a>
+      <a href="arena.html"><span data-i18n="nav.voltar">← Voltar à arena</span></a>
+    </nav>
+    <span class="langBox" style="display:flex;gap:4px"></span>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="wrap hero-center">
+    <div class="eyebrow" data-i18n="rk.oficial">CLASSIFICAÇÃO OFICIAL • MELHOR PONTUAÇÃO, DESEMPATE NO MELHOR TEMPO</div>
+    <h1>🏆 <span class="grad" data-i18n="rk.t">Ranking</span></h1>
+    <p class="subtitle" data-i18n="rk.sub">Ordenado por pontos (maior primeiro). Empate? Ganha quem fez em menos tempo.</p>
+    <div class="hud">
+      <div class="hud-card"><strong id="rkPlayers">0</strong><span data-i18n="rk.jogadores">jogadores</span></div>
+      <div class="hud-card"><strong id="rkFlags">0</strong><span data-i18n="rk.flags">flags validadas</span></div>
+      <div class="hud-card"><strong id="rkLead">—</strong><span data-i18n="rk.lider">líder (pontos)</span></div>
+      <div class="hud-card"><strong>101</strong><span data-i18n="rk.desafios">desafios</span></div>
+      <div class="hud-card"><strong>5</strong><span data-i18n="rk.podios">pódios</span></div>
+    </div>
+    <div class="rank-grid" style="margin-top:14px;text-align:left">
+      <div class="card">
+        <h3 data-i18n="rk.podPts">🏆 Pódio por Pontuação</h3>
+        <div id="podPts" class="out"></div>
+      </div>
+      <div class="card">
+        <h3 data-i18n="rk.podTF">🟢 Melhor Tempo — Fácil</h3>
+        <p class="muted" data-i18n="rk.subTF">Menor ritmo médio nas fases fáceis.</p>
+        <div id="podTF" class="out"></div>
+      </div>
+      <div class="card">
+        <h3 data-i18n="rk.podTM">🟡 Melhor Tempo — Médio</h3>
+        <p class="muted" data-i18n="rk.subTM">Menor ritmo médio nas fases médias.</p>
+        <div id="podTM" class="out"></div>
+      </div>
+      <div class="card">
+        <h3 data-i18n="rk.podTA">🔴 Melhor Tempo — Avançado</h3>
+        <p class="muted" data-i18n="rk.subTA">Menor ritmo médio nas fases avançadas.</p>
+        <div id="podTA" class="out"></div>
+      </div>
+
+      <div class="card">
+        <h3 data-i18n="rk.podEfic">⚡ Eficiência</h3>
+        <p class="muted" data-i18n="rk.eficSub">Índice = (pontos ÷ horas) × 2, tipo IMC — só entra quem tem 10+ fases.</p>
+        <div id="podEfic" class="out"></div>
+      </div>
+      <div class="card">
+        <h3 data-i18n="rk.podTeams">👥 Pódio das Equipes</h3>
+        <p class="muted" data-i18n="rk.teamSub">Soma dos pontos dos membros (máx 4 por equipe).</p>
+        <div id="podTeams" class="out"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="wrap">
+  <div class="card">
+    <h3 data-i18n="rk.geral">📊 Classificação geral</h3>
+    <div style="overflow:auto"><table class="adm-table">
+      <thead><tr><th>#</th><th data-i18n="rk.thJog">Jogador</th><th data-i18n="rk.thPts">Pontos</th><th>Solves</th><th data-i18n="rk.thTempo">Tempo</th><th data-i18n="rk.thBest">Melhor tempo (zerou)</th><th data-i18n="rk.thFase">Por fase</th></tr></thead>
+      <tbody id="rkBody"></tbody>
+    </table></div>
+  </div>
+  <div class="card" style="margin-top:14px" id="equipes">
+    <h3><span data-i18n="rk.teamT">👥 Ranking por Equipes</span> <span class="muted" style="font-size:11px" data-i18n="rk.teamSub2">(máx 4 • soma dos pontos individuais)</span></h3>
+    <div style="overflow:auto"><table class="adm-table">
+      <thead><tr><th>#</th><th data-i18n="rk.thEquipe">Equipe</th><th data-i18n="rk.thPts">Pontos</th><th>Solves</th><th data-i18n="rk.members">Membros</th><th data-i18n="rk.thTempo">Tempo</th></tr></thead>
+      <tbody id="teamBody"></tbody>
+    </table></div>
+  </div>
+  <div class="card" style="margin-top:14px">
+    <h3 data-i18n="rk.cheat">🚫 Lista de trapaceiros</h3>
+    <p class="muted" data-i18n="rk.cheatSub">Continuam no ranking, carimbados de 🚫 com o motivo registrado pelo ADM.</p>
+    <div id="rkCheat" class="out"></div>
+  </div>
+  <footer class="footer"><p><span id="connIp" class="hidden"></span>CTF-ES • <span data-i18n="rk.foot">ranking local deste navegador/servidor.</span> <a href="ctf.html"><span data-i18n="rk.voltar">Voltar →</span></a></p></footer>
+</div>
+
+<script>
+function fmt(ms){ if(ms==null||!isFinite(ms)) return "—"; const s=Math.floor(ms/1000); const p=n=>String(n).padStart(2,"0"); return p(Math.floor(s/3600))+":"+p(Math.floor(s%3600/60))+":"+p(s%60); }
+function toggleFases(i){
+  const det=document.getElementById("det"+i); if(!det) return;
+  det.classList.toggle("hidden");
+  if(det.classList.contains("hidden")) return;
+  const r=(window._rk||[])[i]; const box=document.getElementById("detBox"+i);
+  if(!r||!box) return;
+  const ph=r.phases||{};
+  const ids=Object.keys(ph).map(Number).sort((a,b)=>a-b);
+  const rt=r.ritmo||{};
+  const ritmo=T("rk.pace")+`<div style="margin-bottom:6px"> 🟢: <b>${fmt(rt.facil)}</b> • 🟡: <b>${fmt(rt.medio)}</b> • 🔴: <b>${fmt(rt.avancado)}</b></div>`;
+  box.innerHTML=ritmo+(ids.length
+    ? `<span class="muted">${T("rk.sumTitle")} <b>${r.name}</b>:</span><div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px">`+ids.map(id=>`<span class="live">`+T("rk.phase")+` ${id}: <b>${fmt(ph[id])}</b></span>`).join("")+`</div>`
+    : `<span class="muted">${T("rk.noTimes")}</span>`);
+}
+(async function(){
+  let rk=[]; try{ rk=JSON.parse(localStorage.getItem("ctf_ranking")||"[]"); }catch(e){}
+  let ch=[]; try{ ch=JSON.parse(localStorage.getItem("ctf_cheaters")||"[]"); }catch(e){}
+  let online=false;
+  try{
+    const c=new AbortController(); const t=setTimeout(()=>c.abort(),6000);
+    const r=await fetch("/api/ctf/scoreboard",{signal:c.signal}); clearTimeout(t);
+    const d=await r.json();
+    if(d&&d.ok){ rk=d.ranking||[]; online=true;
+      try{
+        const r2=await fetch("/api/ctf/cheaters"); const d2=await r2.json();
+        if(d2&&d2.ok) ch=d2.cheaters||[];
+      }catch(e){}
+      document.querySelector(".eyebrow").textContent="CLASSIFICAÇÃO OFICIAL • GLOBAL 🌐 • MELHOR PONTUAÇÃO, DESEMPATE NO MELHOR TEMPO";
+    }
+  }catch(e){}
+  const chMap={}; ch.forEach(c=>chMap[c.name]=c.reason);
+  const badge=n=>chMap[n]?` <span class="badge-adm" title="${chMap[n].replace(/"/g,"")}">🚫 TRAPAÇA</span>`:"";
+  rk=rk.sort((a,b)=> b.pts!==a.pts ? b.pts-a.pts : (a.time??Infinity)-(b.time??Infinity));
+  document.getElementById("rkPlayers").textContent=rk.length;
+  document.getElementById("rkFlags").textContent=rk.reduce((a,r)=>a+(r.solves||0),0);
+  document.getElementById("rkLead").textContent=rk.length?rk[0].name:"—";
+  const medalha=i=>i===0?T("rk.ouro"):i===1?T("rk.prata"):T("rk.bronze");
+  const vazio=`<span class="muted">—</span>`;
+  document.getElementById("podPts").innerHTML=rk.length?rk.slice(0,3).map((r,i)=>`<div class="live ${i===0?"ok":""}">${medalha(i)} — <b>${r.name}</b> (${r.pts} pts)</div>`).join(""):vazio;
+  const porTempo=[...rk].filter(r=>r.time!=null).sort((a,b)=>a.time-b.time);
+
+  [["podTF","facil"],["podTM","medio"],["podTA","avancado"]].forEach(([id,lvl])=>{
+    const top=[...rk].filter(r=>r.ritmo&&r.ritmo[lvl]!=null).sort((a,b)=>a.ritmo[lvl]-b.ritmo[lvl]).slice(0,3);
+    document.getElementById(id).innerHTML=top.length?top.map((r,i)=>`<div class="live ${i===0?"ok":""}">${medalha(i)} — <b>${r.name}</b> (${fmt(r.ritmo[lvl])}/${T("rk.thFase").toLowerCase()})</div>`).join(""):`<span class="muted">${T("rk.noneHere")}</span>`;
+  });
+
+  // eficiência: índice IMC com piso de 10 solves (anti-farm de 1 fase)
+  const efic=[...rk].filter(r=>r.solves>=10).map(r=>{ const h=Math.max((r.time||0)/3600000, 1/60); return {r, idx:(r.pts/h)*2}; }).sort((a,b)=>b.idx-a.idx);
+  document.getElementById("podEfic").innerHTML=efic.length?efic.slice(0,3).map((x,i)=>`<div class="live ${i===0?"ok":""}">${medalha(i)} — <b>${x.r.name}</b> (${T("rk.index")} ${x.idx.toFixed(1)})</div>`).join(""):`<span class="muted">${T("rk.none10")}</span>`;
+  const medal=i=>i===0?"🥇":i===1?"🥈":i===2?"🥉":"#"+(i+1);
+  const badgeSr=n=>{ const c=rk.find(x=>x.name===n); const rs=c&&c.reason?c.reason:(chMap[n]||""); return rs?` <span class="badge-adm" title="${rs.replace(/"/g,"")}">🚫 TRAPAÇA</span>`:""; };
+  window._rk=rk;
+  document.getElementById("rkBody").innerHTML=rk.length?rk.map((r,i)=>`<tr><td>${medal(i)}</td><td><b>${r.name}</b>${r.cheat?` <span class="badge-adm" title="${(r.reason||"").replace(/"/g,"")}">🚫 TRAPAÇA</span>`:badgeSr(r.name)}</td><td>${r.pts}</td><td>${r.solves}</td><td>${fmt(r.time)}</td><td>${fmt(r.best)}</td><td><button class="mini" onclick="toggleFases(${i})">⏱ fases</button></td></tr><tr id="det${i}" class="hidden"><td colspan="7"><div id="detBox${i}" class="out"></div></td></tr>`).join(""):`<tr><td colspan="7">${T("rk.none")}</td></tr>`;
+  document.getElementById("rkCheat").innerHTML=ch.length?ch.map(c=>`<div class="live no">🚫 <b>${c.name}</b> — ${c.reason} <span style="opacity:.6">(${c.date})</span></div>`).join(""):`<span class="muted">${T("rk.fair")}</span>`;
+  try{
+    const r3=await fetch("/api/ctf/team/ranking"); const d3=await r3.json();
+    const teams=(d3&&d3.ok?d3.teams:[]);
+    document.getElementById("teamBody").innerHTML=teams.length?teams.map((t,i)=>`<tr><td>${medal(i)}</td><td><b>${t.team}</b>${t.cheaters?` <span class="badge-adm">🚫</span>`:""}</td><td>${t.pts}</td><td>${t.solves}</td><td>${t.members.join(", ")} (${t.n}/4)</td><td>${fmt(t.time)}</td></tr>`).join(""):`<tr><td colspan="6">Nenhuma equipe ainda. Crie a sua na arena!</td></tr>`;
+    document.getElementById("podTeams").innerHTML=teams.length?teams.slice(0,3).map((t,i)=>`<div class="live ${i===0?"ok":""}">${medalha(i)} — <b>${t.team}</b> (${t.pts} pts, ${t.n}/4)</div>`).join(""):`<span class="muted">${T("rk.noneTeam")}</span>`;
+  }catch(e){ document.getElementById("teamBody").innerHTML=`<tr><td colspan="6">${T("rk.teamOnly")}</td></tr>`; }
+  // "Conectado via IP" — só com sessão ativa
+  (async()=>{
+    if(!localStorage.getItem("ctf_token")) return;
+    try{
+      const r=await fetch("https://api.ipify.org?format=json");
+      const d=await r.json();
+      const el=document.getElementById("connIp");
+      if(el&&d.ip){ el.textContent="Conectado via "+d.ip+" • "; el.classList.remove("hidden"); }
+    }catch(e){}
+  })();
+  // selo de segurança apenas na arena (ctf.html) — sem watermark/sensor aqui
+  // presença de visitante: diz "estou aqui" (anônimo)
+  try{ let _v=localStorage.getItem("ctf_vid"); if(!_v){ _v=Math.random().toString(36).slice(2)+Date.now().toString(36); localStorage.setItem("ctf_vid",_v); } const _p=()=>fetch("/api/ctf/ping",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({vid:_v})}).catch(()=>{}); _p(); setInterval(_p,60000); }catch(e){}
+})();
+</script>
+</body>
+</html>
